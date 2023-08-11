@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <title>Testing</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            border: 1px solid black;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .headfix {
+            position: sticky;
+            top: 0;
+            background-color: #f2f2f2;
+        }
+
+        .fixed-header {
+            position: sticky;
+            top: 30px;
+            background-color: #f2f2f2;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+        }
+
+        thead {
+            position: sticky;
+        }
+
+        #Cardd {
+            border-style: solid;
+            width: 190px;
+            border-radius: 10%;
+            margin: 5%;
+            padding: 10px;
+
+        }
+
+        #cardImage {
+            height: 70px;
+            width: 70px;
+            border-radius: 10px;
+        }
+
+        #cardName {
+            text-align: center;
+            font-weight: bolder;
+        }
+
+        #cardDecription {
+            text-align: center;
+            display: inline-block;
+            width: 80px;
+            white-space: nowrap;
+            overflow: hidden !important;
+            text-overflow: ellipsis;
+        }
+
+        .heeader {
+            flex: auto;
+        }
+
+        .searchh {
+            margin-right: 50%;
+
+        }
+
+        .butn1 {}
+
+        .butn2 {}
+
+        fieldset {
+            margin: 10px;
+            padding: 30px;
+            border: #000000 solid 3px;
+        }
+
+        .GridView {
+            display: contents;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .TableView {
+            display: none;
+            width: 100%;
+        }
+
+        legend.scheduler-border {
+            width: inherit;
+            /* Or auto */
+            padding: 0 10px;
+            /* To give a bit of padding on the left and right */
+            border-bottom: none;
+        }
+    </style>
+
+</head>
+
+<body>
+    <fieldset>
+        <legend id="VType">Grid View</legend>
+
+        <div class="headfix heeader ">
+
+            <input class="searchh" type="text" id="searchInput" placeholder="Search by Name" />
+            <button class="butn1" onclick="toggleView('gridd')">Grid View</button>
+            <button class="butn2" onclick="toggleView('table')">Table View</button>
+
+        </div>
+        <div class="GridView">
+            <div class="container text-center">
+                <div class="row" id="gridBody">
+
+                </div>
+            </div>
+        </div>
+        <div class="TableView table-container">
+            <table>
+                <thead>
+                    <tr class="fixed-header">
+                        <th>Image </th>
+                        <th> Name <button class="srtbtn" onclick="findsrttypr()">^</button></th>
+                        <th> Description </th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+
+                </tbody>
+
+            </table>
+        </div>
+        <div>
+            <h1 id="load"></h1>
+        </div>
+    </fieldset>
+    <script>
+        const gridBody = document.getElementById("gridBody");
+        const tableBody = document.getElementById("tableBody");
+        const Loadd = document.getElementById("load");
+        const tableContainer = document.querySelector('.table-container');
+        const fixedHeaderContainer = document.querySelector('.fixed-header-container');
+        const srtbtn = document.getElementById("srtbtn");
+        const VType = document.getElementById("VType");
+        const searchInput = document.getElementById('searchInput');
+        const url1 = "http://run.mocky.io/v3/6f7a76ed-d6f5-4b54-be23-bf9a141c982a";
+        const url2 = "http://run.mocky.io/v3/07316365-b8d2-4574-9bc1-22b17b054e3b";
+        const url3 = "http://run.mocky.io/v3/1c56213e-1191-4b47-a54f-066736165ff3";
+        const urls = [url1, url2, url3];
+        const XHR = new XMLHttpRequest();
+        let totaldata = [];
+        function incertdata(result) {
+            result.map((Data) => {
+                totaldata.push(Data)
+            })
+        }
+        function inirunfun() {
+            loadMore();
+        }
+        (function () {
+            setTimeout(inirunfun, 1000);
+        })();
+
+        let filterdata = [];
+        searchInput.addEventListener('keyup', fidfiltdata);
+        function fidfiltdata() {
+            const searchValue = searchInput.value.toLowerCase();
+            const filteredItems = totaldata.filter(item => item.name.toLowerCase().includes(searchValue));
+            filgrddata = '';
+            filtabdata = '';
+            filterdata = filteredItems;
+            showdata();
+        }
+
+        var grddata = '';
+        var tabdata = '';
+        var filgrddata;
+        var filtabdata;
+        var srttabdata = '';
+        var srtdata = [];
+        var srttype = 0;
+        function findsrttypr() {
+            if (srttype < 2) {
+                srttype += 1;
+            }
+            else {
+                srttype = 0;
+            }
+
+            callSrt();
+        }
+        function callSrt() {
+            if (srttype === 1) {
+                srtData();
+            }
+            else if (srttype === 2) {
+                srtDataRev();
+            }
+            else if (srttype === 0) {
+                showdata();
+            }
+        }
+        function srtDataRev() {
+            srttabdata = '';
+            if (searchInput.value) {
+                const filtersrtdata = filterdata;
+                filtersrtdata.sort((a, b) => a.name.localeCompare(b.name));
+                filtersrtdata.reverse();
+                for (const dataa of filtersrtdata) {
+                    srttabdata += `<tr>
+                            <td> <img id="cardImage" src="${dataa.image}" alt="Girl in a jacket" ></td>
+                            <td> ${dataa.name} </td>
+                            <td> <a id="cardDecription">${dataa.description}</a></td>
+                        </tr>`;
+                }
+            }
+            else {
+                const totalsrtdata = totaldata;
+                totalsrtdata.sort((a, b) => a.name.localeCompare(b.name));
+                totalsrtdata.reverse();
+                for (const dataa of totalsrtdata) {
+                    srttabdata += `<tr>
+                            <td> <img id="cardImage" src="${dataa.image}" alt="Girl in a jacket" ></td>
+                            <td> ${dataa.name} </td>
+                            <td> <a id="cardDecription">${dataa.description}</a></td>
+                        </tr>`;
+                }
+            }
+            tableBody.innerHTML = srttabdata;
+        }
+        function srtData() {
+            srttabdata = '';
+            if (searchInput.value) {
+                const filtersrtdata = filterdata;
+                filtersrtdata.sort((a, b) => a.name.localeCompare(b.name));
+                for (const dataa of filtersrtdata) {
+                    srttabdata += `<tr>
+                            <td> <img id="cardImage" src="${dataa.image}" alt="Girl in a jacket" ></td>
+                            <td> ${dataa.name} </td>
+                            <td> <a id="cardDecription">${dataa.description}</a></td>
+                        </tr>`;
+                }
+            }
+            else {
+                const totalsrtdata = totaldata;
+                totalsrtdata.sort((a, b) => a.name.localeCompare(b.name));
+                for (const dataa of totalsrtdata) {
+                    srttabdata += `<tr>
+                            <td> <img id="cardImage" src="${dataa.image}" alt="Girl in a jacket" ></td>
+                            <td> ${dataa.name} </td>
+                            <td> <a id="cardDecription">${dataa.description}</a></td>
+                        </tr>`;
+                }
+            }
+            tableBody.innerHTML = srttabdata;
+        }
+        function showfiltdata(filterdata) {
+            filterdata.map((dataa) => {
+                filgrddata += `<div id="Cardd" class="col-lg-3 col-md-4  col-sm-6" ><div>
+                    <img id="cardImage" src="${dataa.image}" alt="Girl in a jacket" >
+                    <br>
+                    <a id="cardName">${dataa.name}</a>
+                    <br>
+                    <a id="cardDecription">${dataa.description}</a>
+                </div></div>`;
+                filtabdata += `<tr>
+                            <td> <img id="cardImage" src="${dataa.image}" alt="Girl in a jacket" ></td>
+                            <td> ${dataa.name} </td>
+                            <td> <a id="cardDecription">${dataa.description}</a></td>
+                        </tr>`;
+            })
+            tableBody.innerHTML = filtabdata;
+            gridBody.innerHTML = filgrddata;
+        }
+        function showdata() {
+            totaldata
+            if (searchInput.value) {
+                if (srttype === 0) {
+
+                    showfiltdata(filterdata);
+                }
+                else {
+                    callSrt();
+                }
+            }
+            else {
+                if (srttype === 0) {
+                    grddata = '';
+                    tabdata = '';
+                    totaldata.map((dataa) => {
+                        grddata += `<div id="Cardd" class="col-lg-3 col-md-4  col-sm-6" ><div>
+                            <img id="cardImage" src="${dataa.image}" alt="Girl in a jacket" >
+                            <br>
+                            <a id="cardName">${dataa.name}</a>
+                            <br>
+                            <a id="cardDecription">${dataa.description}</a>
+                        </div></div>`;
+                        tabdata += `<tr>
+                                    <td> <img id="cardImage" src="${dataa.image}" alt="Girl in a jacket" ></td>
+                                    <td> ${dataa.name} </td>
+                                    <td> <a id="cardDecription">${dataa.description}</a></td>
+                                </tr>`;
+
+                    })
+
+                    tableBody.innerHTML = tabdata;
+                    gridBody.innerHTML = grddata;
+                }
+                else {
+                    callSrt();
+                }
+            }
+        }
+        function toggleView(view) {
+            const grid = document.querySelector('.GridView');
+            const table = document.querySelector('.TableView');
+
+            if (view === 'gridd') {
+                grid.style.display = 'contents';
+                table.style.display = 'none';
+                VType.innerText = "Grid View";
+            } else if (view === 'table') {
+                grid.style.display = 'none';
+                table.style.display = 'contents';
+                VType.innerText = "Table View";
+            }
+        }
+        var lnkidx = 0;
+        function loadMore() {
+            XHR.onreadystatechange = () => {
+                if (XHR.readyState >= 1 && XHR.readyState < 4) {
+                    Loadd.innerText = "Loading..."
+                }
+
+                if (XHR.readyState == 4 && XHR.status == 200) {
+                    const parsedData = JSON.parse(XHR.responseText);
+                    console.log(parsedData);
+                    parsedData.map((additionaldata) => {
+                        totaldata.push(additionaldata)
+                    })
+
+                    if (lnkidx < 2) {
+                        lnkidx += 1;
+                    }
+                    else {
+                        lnkidx = 0;
+                    }
+                    Loadd.innerText = "Loaded";
+
+                    showdata();
+                }
+            }
+            console.log("index nnumbrt" + lnkidx);
+            XHR.open("GET", urls[lnkidx]);
+            XHR.send();
+
+        }
+        window.onscroll = function () {
+            var distanceScrolled = document.documentElement.scrollTop;
+            if ((($(window).innerHeight() + ($(window).scrollTop())) >= $("body").height())) {
+                console.log("finished");
+                loadMore();
+            }
+
+            console.log(totaldata.length);
+        }
+    </script>
+
+</body>
+
+</html>
